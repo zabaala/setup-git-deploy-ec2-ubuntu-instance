@@ -22,9 +22,32 @@ $ git init --bare
 ```
 $ cat > hooks/post-receive
 #!/bin/sh
-GIT_WORK_TREE=/home/ubuntu/www/yourdomain.com
-export GIT_WORK_TREE
+export GIT_WORK_TREE=/var/www
 git checkout -f
+sudo chown -Rf ubuntu:ubuntu /var/www
+cd /var/www
+
+if [ ! -f .env ]; then
+	mv .env.example .env
+	composer install
+	./artisan key:generate
+	composer exec "Illuminate\\Foundation\\ComposerScripts::postInstall"
+else
+	composer update
+	composer exec "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+fi
+
+chmod -Rf +w storage bootstrap/cache
+
+./artisan optimize
+./artisan migrate
+./artisan route:clear
+./artisan route:cache
+```
+
+After create post-receive file, make him as executable.
+
+```
 $ chmod +x hooks/post-receive
 ```
 
