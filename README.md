@@ -20,29 +20,28 @@ $ git init --bare
 3 - on remote server: create post-receive hook
 
 ```
-$ cat > hooks/post-receive
-#!/bin/sh
 export GIT_WORK_TREE=/var/www
 git checkout -f
 sudo chown -Rf ubuntu:ubuntu /var/www
 cd /var/www
 
 if [ ! -f .env ]; then
-	mv .env.example .env
-	composer install
-	./artisan key:generate
-	composer exec "Illuminate\\Foundation\\ComposerScripts::postInstall"
+        mv .env.example .env
+        composer install
+        ./artisan key:generate
+        composer exec "Illuminate\\Foundation\\ComposerScripts::postInstall"
 else
-	composer update
-	composer exec "Illuminate\\Foundation\\ComposerScripts::postUpdate"
+        composer update
+        composer exec "Illuminate\\Foundation\\ComposerScripts::postUpdate"
 fi
 
-chmod -Rf +w storage bootstrap/cache
+chmod -Rf 777 storage bootstrap/cache
 
 ./artisan optimize
 ./artisan migrate
 ./artisan route:clear
 ./artisan route:cache
+./artisan queue:restart
 ```
 
 After create post-receive file, make him as executable.
