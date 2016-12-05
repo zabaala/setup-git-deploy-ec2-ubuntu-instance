@@ -20,6 +20,7 @@ $ git init --bare
 3 - on remote server: create post-receive hook
 
 ```
+#!/bin/sh
 export GIT_WORK_TREE=/var/www
 git checkout -f
 sudo chown -Rf ubuntu:ubuntu /var/www
@@ -42,6 +43,8 @@ chmod -Rf 777 storage bootstrap/cache
 ./artisan route:clear
 ./artisan route:cache
 ./artisan queue:restart
+
+sudo service supervisor restart
 ```
 
 After create post-receive file, make him as executable.
